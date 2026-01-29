@@ -16,15 +16,15 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
         const empresaCard = document.createElement("div");
         empresaCard.classList.add("card");
 
-        // Determina cor do rating
+        // Cor do rating
         let ratingColor;
         switch(data.rating.nota.toUpperCase()) {
-            case 'A': ratingColor = '#2ecc71'; break; // verde
-            case 'B': ratingColor = '#27ae60'; break; // verde médio
-            case 'C': ratingColor = '#f1c40f'; break; // amarelo
-            case 'D': ratingColor = '#e67e22'; break; // laranja
-            case 'E': ratingColor = '#e74c3c'; break; // vermelho
-            default: ratingColor = '#95a5a6'; // cinza
+            case 'A': ratingColor = '#2ecc71'; break;
+            case 'B': ratingColor = '#27ae60'; break;
+            case 'C': ratingColor = '#f1c40f'; break;
+            case 'D': ratingColor = '#e67e22'; break;
+            case 'E': ratingColor = '#e74c3c'; break;
+            default: ratingColor = '#95a5a6';
         }
 
         empresaCard.innerHTML = `
@@ -37,14 +37,15 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
             </div>
             <p><strong>Rating:</strong> <span style="color:${ratingColor}; font-weight:bold;">${data.rating.nota}</span> - ${data.rating.justificativa}</p>
             <p><strong>Perfil de Crédito:</strong> ${data.perfil_credito.classificacao} - ${data.perfil_credito.justificativa}</p>
-            <div>
-                <canvas id="perfilChart"></canvas>
-            </div>
+
+            <h3>Indicadores</h3>
+            <canvas id="perfilChart"></canvas>
+            <canvas id="capacidadeChart" style="margin-top:12px;"></canvas>
         `;
         container.appendChild(empresaCard);
 
-        // -------------------- Animação da barra de capacidade --------------------
-        const capacidadePercent = Math.min((data.capacidade_endividamento / 1000000) * 100, 100); // Ajuste conforme limite desejado
+        // -------------------- Barra de progresso animada --------------------
+        const capacidadePercent = Math.min((data.capacidade_endividamento / 1000000) * 100, 100);
         const capacidadeBar = document.getElementById("capacidadeBar");
         let width = 0;
         const interval = setInterval(() => {
@@ -74,10 +75,28 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
                 }]
             },
             options: {
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } }
-                },
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } } },
                 cutout: '70%'
+            }
+        });
+
+        // -------------------- Gráfico Capacidade vs Limite --------------------
+        const ctxCap = document.getElementById("capacidadeChart").getContext("2d");
+        new Chart(ctxCap, {
+            type: 'bar',
+            data: {
+                labels: ['Capacidade atual', 'Limite Máximo'],
+                datasets: [{
+                    label: 'R$',
+                    data: [data.capacidade_endividamento, 1000000], // limite fictício 1.000.000
+                    backgroundColor: ['#2980b9', '#bdc3c7']
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: value => 'R$ ' + value.toLocaleString() } }
+                }
             }
         });
 
