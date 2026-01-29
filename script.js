@@ -3,7 +3,7 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
     container.innerHTML = "Carregando...";
 
     try {
-        const response = await fetch("https://SEU-PROJETO.up.railway.app/relatorio/credito-html");
+        const response = await fetch("api-smart-production-5d59.up.railway.app");
         if (!response.ok) {
             throw new Error(`Erro ${response.status}`);
         }
