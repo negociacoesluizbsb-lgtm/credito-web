@@ -3,13 +3,14 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
     container.innerHTML = "Carregando...";
 
     try {
-        // Endpoint correto da API
+        // Endpoint completo da API
         const response = await fetch("https://api-smart-production-5d59.up.railway.app/relatorio/credito-html");
 
         if (!response.ok) {
             throw new Error(`Erro ${response.status}: Não foi possível carregar o relatório`);
         }
 
+        // Aqui garantimos que o conteúdo seja interpretado como HTML
         const html = await response.text();
         container.innerHTML = html;
 
