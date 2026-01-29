@@ -3,7 +3,7 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
     container.innerHTML = "Carregando...";
 
     try {
-        const response = await fetch("api-smart-production-5d59.up.railway.app");
+        const response = await fetch("https://api-smart-production-5d59.up.railway.app/relatorio/credito-html");
         if (!response.ok) {
             throw new Error(`Erro ${response.status}`);
         }
@@ -13,4 +13,3 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
         container.innerHTML = `Erro ao carregar relatório: ${err}`;
     }
 });
-
