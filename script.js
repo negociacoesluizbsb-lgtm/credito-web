@@ -13,7 +13,6 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
         const empresaCard = document.createElement("div");
         empresaCard.classList.add("card");
 
-        // Cor do rating
         const ratingMap = { A:'#2ecc71', B:'#27ae60', C:'#f1c40f', D:'#e67e22', E:'#e74c3c' };
         const ratingColor = ratingMap[data.rating.nota.toUpperCase()] || '#95a5a6';
 
@@ -21,10 +20,12 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
             <h2 class="section-title">Análise da Empresa</h2>
             <p><strong>Empresa:</strong> ${data.empresa}</p>
             <p><strong>Setor:</strong> ${data.setor}</p>
+
             <p><strong>Capacidade de Endividamento:</strong></p>
             <div class="progress-bar">
-                <div class="progress" id="capacidadeBar" style="width:0%;"></div>
+                <div class="progress" id="capacidadeBar" style="width:0%"></div>
             </div>
+
             <p><strong>Rating:</strong> <span style="color:${ratingColor}; font-weight:bold;">${data.rating.nota}</span> - ${data.rating.justificativa}</p>
             <p><strong>Perfil de Crédito:</strong> ${data.perfil_credito.classificacao} - ${data.perfil_credito.justificativa}</p>
 
@@ -49,7 +50,7 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
             }
         }, 15);
 
-        // -------------------- Gráfico Doughnut Perfil de Crédito --------------------
+        // -------------------- Gráfico Doughnut Perfil --------------------
         new Chart(document.getElementById("perfilChart"), {
             type: 'doughnut',
             data: {
@@ -64,7 +65,11 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
                     borderWidth: 0
                 }]
             },
-            options:{plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:10}}},cutout:'70%'}
+            options:{
+                plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:10}}},
+                cutout:'70%',
+                responsive:true
+            }
         });
 
         // -------------------- Gráfico Barra Capacidade vs Limite --------------------
@@ -72,16 +77,36 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
             type:'bar',
             data:{
                 labels:['Capacidade Atual','Limite Máximo'],
-                datasets:[{label:'R$',data:[data.capacidade_endividamento,1000000],backgroundColor:['#2980b9','#bdc3c7'] }]
+                datasets:[{
+                    label:'R$',
+                    data:[data.capacidade_endividamento,1000000],
+                    backgroundColor:['#2980b9','#bdc3c7'],
+                    borderRadius:5
+                }]
             },
             options:{
-                plugins:{legend:{display:false}},
-                scales:{y:{beginAtZero:true,ticks:{callback:value=>'R$ '+value.toLocaleString()}}}
+                responsive:true,
+                plugins:{
+                    legend:{display:false},
+                    tooltip:{
+                        callbacks:{
+                            label: function(ctx){ return 'R$ ' + ctx.raw.toLocaleString(); }
+                        }
+                    }
+                },
+                scales:{
+                    y:{
+                        beginAtZero:true,
+                        ticks:{
+                            callback:value=>'R$ '+value.toLocaleString()
+                        }
+                    }
+                }
             }
         });
 
-        // -------------------- Gráfico Linha Evolução de Rating (Exemplo) --------------------
-        const ratingHistory = [3,4,4,3,4]; // exemplo fictício (1-5)
+        // -------------------- Gráfico Linha Evolução de Rating --------------------
+        const ratingHistory = [3,4,4,3,4]; // exemplo fictício histórico
         new Chart(document.getElementById("evolucaoChart"), {
             type:'line',
             data:{
@@ -92,20 +117,33 @@ document.getElementById("carregarRelatorio").addEventListener("click", async () 
                     borderColor:'#8e44ad',
                     backgroundColor:'rgba(142,68,173,0.2)',
                     tension:0.3,
-                    fill:true
+                    fill:true,
+                    pointRadius:6,
+                    pointBackgroundColor:'#8e44ad',
+                    pointHoverRadius:8
                 }]
             },
             options:{
                 responsive:true,
-                plugins:{legend:{display:false}},
-                scales:{y:{beginAtZero:true,max:5}}
+                plugins:{
+                    tooltip:{
+                        mode:'index',
+                        intersect:false,
+                        callbacks:{
+                            label:function(ctx){ return 'Nota: '+ctx.raw; }
+                        }
+                    },
+                    legend:{display:false}
+                },
+                scales:{
+                    y:{beginAtZero:true,max:5,ticks:{stepSize:1}}
+                }
             }
         });
 
         // -------------------- CARD 2: Parecer de Crédito --------------------
         const creditoCard = document.createElement("div");
         creditoCard.classList.add("card");
-
         creditoCard.innerHTML = `
             <h2 class="section-title">Parecer de Crédito</h2>
             <p><strong>Conclusão:</strong> ${data.parecer.conclusao}</p>
